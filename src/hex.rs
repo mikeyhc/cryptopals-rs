@@ -4,7 +4,7 @@ use std::error::Error;
 use std::string::ToString;
 
 use super::bytestring::Bytestring;
-use super::cryptostring::Xor;
+use super::cryptostring::{Score, Xor};
 
 #[derive(Debug, Clone)]
 pub struct InvalidHexError(String);
@@ -22,7 +22,7 @@ impl Error for InvalidHexError {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Hex(String);
 
 impl From<&Bytestring> for Hex {
@@ -118,6 +118,20 @@ impl Xor<Hex> for Hex {
         let b0: Bytestring = self.into();
         let b1: Bytestring = other.into();
         Hex::from(&b0.xor(&b1))
+    }
+}
+
+impl Xor<u8> for Hex {
+    fn xor(&self, other: &u8) -> Hex {
+        let b0: Bytestring = self.into();
+        Hex::from(&b0.xor(other))
+    }
+}
+
+impl Score for Hex {
+    fn score(&self) -> f32 {
+        let b0: Bytestring = self.into();
+        b0.score()
     }
 }
 
